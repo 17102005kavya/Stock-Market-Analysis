@@ -1,8 +1,8 @@
 # Stock Market Analysis — Hadoop MapReduce
 
-This repository contains my implementation of the **Stock Market Analysis Hadoop MapReduce Homework**. The assignment demonstrates MapReduce programming using Java on a pseudo-distributed Hadoop installation / Cloudera VM.
+This repository contains my implementation of the **Stock Market Analysis Hadoop MapReduce assignment** using Java and Hadoop MapReduce.
 
-The homework consists of two mandatory MapReduce problems and one optional EMR exercise.
+The project focuses on analyzing historical stock-price data using distributed MapReduce processing on Hadoop and Amazon EMR.
 
 ---
 
@@ -11,7 +11,6 @@ The homework consists of two mandatory MapReduce problems and one optional EMR e
 ```text
 Stock-market-analysis-Hadoop/
 │
-├── MyWordCount.java
 ├── AnalyzeStock.java
 ├── AnalyzeStockAdvanced.java
 └── README.md
@@ -19,81 +18,9 @@ Stock-market-analysis-Hadoop/
 
 ---
 
-# Part A — MapReduce on Hadoop
+# Part A — Stock Price Analysis
 
-## 1. MyWordCount — WordCount 2.0
-
-### Objective
-
-The standard Hadoop WordCount program was modified to:
-
-* Count word frequencies.
-* Remove punctuation.
-* Remove stop words.
-* Support case-sensitive and case-insensitive processing.
-* Support multiple HDFS input paths.
-* Allow the user to specify the number of reducers.
-* Validate command-line arguments.
-* Write the final word-frequency output to HDFS.
-
-### Program
-
-```text
-MyWordCount.java
-```
-
-### Command-Line Arguments
-
-The program accepts four positional arguments:
-
-```text
-1. Number of reducers
-2. Case sensitivity: true | false
-3. Comma-separated HDFS input paths
-4. HDFS output path
-```
-
-### Example
-
-```bash
-hadoop jar MyWordCount.jar MyWordCount \
-4 \
-true \
-/user/cloudera/input/big.txt,/user/cloudera/input/writprog.pro \
-/user/cloudera/outputWordCount
-```
-
-Case-insensitive execution:
-
-```bash
-hadoop jar MyWordCount.jar MyWordCount \
-2 \
-false \
-/user/cloudera/input/big.txt,/user/cloudera/input/writprog.pro \
-/user/cloudera/outputWordCount
-```
-
-### View Output
-
-```bash
-hdfs dfs -ls /user/cloudera/outputWordCount
-```
-
-```bash
-hdfs dfs -cat /user/cloudera/outputWordCount/part-*
-```
-
-### Remove Output Before Re-running
-
-Hadoop MapReduce requires the output directory to not already exist.
-
-```bash
-hdfs dfs -rm -r /user/cloudera/outputWordCount
-```
-
----
-
-# 2. AnalyzeStock — Stock Price Analysis
+## AnalyzeStock
 
 ### Objective
 
@@ -113,12 +40,6 @@ The supported stock-price fields are:
 close
 low
 high
-```
-
-### Program
-
-```text
-AnalyzeStock.java
 ```
 
 ### Input Format
@@ -148,7 +69,7 @@ The program accepts six positional arguments:
 6. HDFS output path
 ```
 
-Date arguments use:
+Dates are specified in:
 
 ```text
 MM/DD/YYYY
@@ -190,13 +111,9 @@ close \
 /user/cloudera/stockoutput
 ```
 
-### View Output
+### Output
 
-```bash
-hdfs dfs -cat /user/cloudera/stockoutput/*
-```
-
-The output has the following format:
+The output contains the aggregated value for each stock ticker:
 
 ```text
 ticker    aggregated_value
@@ -212,7 +129,15 @@ AAON    8.3
 AAPL    33.6
 ```
 
+### View Output
+
+```bash
+hdfs dfs -cat /user/cloudera/stockoutput/*
+```
+
 ### Remove Output Before Re-running
+
+Hadoop requires the output directory to not already exist.
 
 ```bash
 hdfs dfs -rm -r /user/cloudera/stockoutput
@@ -220,26 +145,20 @@ hdfs dfs -rm -r /user/cloudera/stockoutput
 
 ---
 
-# Part B — Amazon EMR (Extra Credit)
+# Part B — Amazon EMR
 
 ## AnalyzeStockAdvanced
 
-This is the optional EMR/advanced MapReduce exercise.
+`AnalyzeStockAdvanced` is the advanced MapReduce implementation designed to run on Hadoop/Amazon EMR.
 
 ### Objective
 
-For every year in the stock-price dataset, find the stock ticker having the **largest yearly fluctuation**.
+For every year in the stock-price dataset, the program finds the stock ticker with the **largest yearly price fluctuation**.
 
-The fluctuation is defined as:
+The fluctuation is calculated as:
 
 ```text
 Difference = High Price - Low Price
-```
-
-The program produces:
-
-```text
-Year    Ticker    Low    High    Difference
 ```
 
 ### Program
@@ -257,7 +176,7 @@ The program accepts two positional arguments:
 2. Output path
 ```
 
-The paths can point to HDFS or Amazon S3.
+The paths can be HDFS or Amazon S3 locations.
 
 ### HDFS Example
 
@@ -290,10 +209,9 @@ Example:
 ```text
 1995    AAPL    12.8    79.2    66.4
 1996    ABC     15.1    92.4    77.3
-...
 ```
 
-The program uses MapReduce processing to determine the maximum yearly fluctuation.
+The output identifies the ticker with the maximum yearly difference between its high and low prices.
 
 ---
 
@@ -301,26 +219,32 @@ The program uses MapReduce processing to determine the maximum yearly fluctuatio
 
 The assignment uses historical stock-price data obtained from Quandl.
 
-Two datasets were provided:
-
-### Full Dataset
-
-Approximately:
+The input dataset contains the following fields:
 
 ```text
-Compressed: ~400 MB
-Uncompressed: ~1.6 GB
+ticker
+date
+open
+high
+low
+close
+volume
+ex-dividend
+split_ratio
+adj_open
+adj_high
+adj_low
+adj_close
+adj_volume
 ```
 
-### Sample Dataset
-
-The smaller sample dataset can be used during development and testing.
-
-Expected input format:
+The date format in the original dataset is:
 
 ```text
-ticker,date,open,high,low,close,volume,ex-dividend,split_ratio,adj_open,adj_high,adj_low,adj_close,adj_volume
+yyyy-mm-dd
 ```
+
+A smaller sample dataset can be used for local development and testing before processing the full dataset.
 
 ---
 
@@ -338,17 +262,16 @@ ticker,date,open,high,low,close,volume,ex-dividend,split_ratio,adj_open,adj_high
 
 # MapReduce Concepts Demonstrated
 
-This homework demonstrates the following Hadoop concepts:
+This project demonstrates:
 
 * Mapper and Reducer implementation
 * Key-value based MapReduce processing
 * Multiple reducers
 * HDFS input/output
 * Command-line argument handling
-* Passing configuration values to MapReduce tasks
 * CSV parsing
 * Date-range filtering
-* Aggregation using `avg`, `min`, and `max`
+* `avg`, `min`, and `max` aggregation
 * Intermediate key-value design
 * Sorting and grouping by keys
 * Multi-stage MapReduce processing
@@ -361,29 +284,25 @@ This homework demonstrates the following Hadoop concepts:
 
 The Java programs can be compiled using the Hadoop libraries available in the Hadoop environment.
 
-Example:
-
-```bash
-javac -classpath "$(hadoop classpath)" -d . MyWordCount.java
-```
+### AnalyzeStock
 
 ```bash
 javac -classpath "$(hadoop classpath)" -d . AnalyzeStock.java
 ```
 
-```bash
-javac -classpath "$(hadoop classpath)" -d . AnalyzeStockAdvanced.java
-```
-
-Create JAR files:
-
-```bash
-jar cf MyWordCount.jar *.class
-```
+Create the JAR:
 
 ```bash
 jar cf AnalyzeStock.jar *.class
 ```
+
+### AnalyzeStockAdvanced
+
+```bash
+javac -classpath "$(hadoop classpath)" -d . AnalyzeStockAdvanced.java
+```
+
+Create the JAR:
 
 ```bash
 jar cf AnalyzeStockAdvanced.jar *.class
@@ -393,19 +312,7 @@ The exact compilation command may vary depending on the Hadoop/Cloudera installa
 
 ---
 
-# Important Hadoop Notes
-
-### Output Directory
-
-Hadoop will fail if the specified output directory already exists.
-
-Remove it before re-running:
-
-```bash
-hdfs dfs -rm -r <output-path>
-```
-
-### Viewing HDFS Files
+# Useful HDFS Commands
 
 List files:
 
@@ -413,12 +320,35 @@ List files:
 hdfs dfs -ls <path>
 ```
 
-Read output:
+View output:
 
 ```bash
 hdfs dfs -cat <path>/*
 ```
 
-### Multiple Input Files
+Remove an output directory:
 
-`MyWordCount` supports multiple HDFS input paths by providing them as a comma-separated argum
+```bash
+hdfs dfs -rm -r <output-path>
+```
+
+---
+
+# Project Status
+
+| Component            | Status    |
+| -------------------- | --------- |
+| AnalyzeStock         | Completed |
+| AnalyzeStockAdvanced | Completed |
+| HDFS Testing         | Completed |
+| MapReduce Testing    | Completed |
+| EMR Exercise         | Completed |
+
+---
+
+## Author
+
+**Kavya Nair Puthiyedath**
+
+B.Tech Computer Science & Engineering
+IIIT Kottayam
